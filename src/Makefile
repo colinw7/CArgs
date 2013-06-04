@@ -16,7 +16,10 @@ CArgs.cpp
 
 OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
-CPPFLAGS = -I$(INC_DIR) -I.
+CPPFLAGS = \
+-I$(INC_DIR) \
+-I../../CStrUtil/include \
+-I.
 
 clean:
 	$(RM) -f $(OBJ_DIR)/*.o
