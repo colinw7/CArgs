@@ -19,6 +19,7 @@ OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 CPPFLAGS = \
 -I$(INC_DIR) \
 -I../../CStrUtil/include \
+-I../../CUtil/include \
 -I.
 
 clean:
