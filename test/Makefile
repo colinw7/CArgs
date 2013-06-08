@@ -16,7 +16,14 @@ CArgsTest.cpp
 
 OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
-CPPFLAGS = -I$(INC_DIR) -I.
+CPPFLAGS = \
+-I$(INC_DIR) \
+-I.
+
+LFLAGS = \
+-L$(LIB_DIR) \
+-L../../CArgs/lib \
+-L../../CStrUtil/lib \
 
 clean:
 	$(RM) -f $(OBJ_DIR)/*.o
@@ -28,4 +35,4 @@ clean:
 	$(CC) -c $< -o $(OBJ_DIR)/$*.o $(CPPFLAGS)
 
 $(BIN_DIR)/CArgsTest: $(OBJS) $(LIB_DIR)/libCArgs.a
-	$(CC) $(LDEBUG) -o $(BIN_DIR)/CArgsTest $(OBJS) -lCArgs -lCStrUtil -L$(LIB_DIR)
+	$(CC) $(LDEBUG) -o $(BIN_DIR)/CArgsTest $(OBJS) $(LFLAGS) -lCArgs -lCStrUtil
