@@ -12,6 +12,7 @@
   strncpy((char *) calloc((n)+1,sizeof(char)),s,n)
 
 enum CArgType {
+  CARG_TYPE_NONE,
   CARG_TYPE_BOOLEAN,
   CARG_TYPE_INTEGER,
   CARG_TYPE_REAL,
@@ -26,6 +27,8 @@ enum CArgFlag {
   CARG_FLAG_SKIP     = (1<<2),
   CARG_FLAG_MULTIPLE = (1<<3)
 };
+
+//---
 
 class CArg {
  public:
@@ -75,12 +78,14 @@ class CArg {
 
  private:
   std::string name_;
-  CArgType    type_;
-  int         flags_;
-  bool        attached_;
-  bool        set_;
+  CArgType    type_     { CARG_TYPE_NONE };
+  int         flags_    { 0 };
+  bool        attached_ { false };
+  bool        set_      { false };
   std::string desc_;
 };
+
+//---
 
 class CArgBoolean : public CArg {
  public:
@@ -97,9 +102,11 @@ class CArgBoolean : public CArg {
   virtual void print() const;
 
  private:
-  bool value_;
-  bool defval_;
+  bool value_  { false };
+  bool defval_ { false };
 };
+
+//---
 
 class CArgInteger : public CArg {
  public:
@@ -117,9 +124,11 @@ class CArgInteger : public CArg {
   virtual void print() const;
 
  private:
-  long value_;
-  long defval_;
+  long value_  { 0 };
+  long defval_ { 0 };
 };
+
+//---
 
 class CArgReal : public CArg {
  public:
@@ -137,9 +146,11 @@ class CArgReal : public CArg {
   virtual void print() const;
 
  private:
-  double value_;
-  double defval_;
+  double value_  { 0.0 };
+  double defval_ { 0.0 };
 };
+
+//---
 
 class CArgString : public CArg {
  public:
@@ -160,6 +171,8 @@ class CArgString : public CArg {
   std::string value_;
   std::string defval_;
 };
+
+//---
 
 class CArgStringList : public CArg {
  public:
@@ -184,6 +197,8 @@ class CArgStringList : public CArg {
   std::string defval_;
 };
 
+//---
+
 class CArgChoice : public CArg {
  public:
   typedef std::vector<std::string> ChoiceList;
@@ -203,10 +218,12 @@ class CArgChoice : public CArg {
   virtual void print() const;
 
  private:
-  long       value_;
+  long       value_ { 0 };
   ChoiceList choices_;
-  long       defval_;
+  long       defval_ { 0 };
 };
+
+//---
 
 class CArgs {
  public:
@@ -292,8 +309,8 @@ class CArgs {
  private:
   std::string def_;
   ArgList     args_;
-  bool        skip_remaining_;
-  bool        help_;
+  bool        skip_remaining_ { false };
+  bool        help_ { false };
 };
 
 #endif

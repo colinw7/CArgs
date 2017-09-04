@@ -104,11 +104,7 @@
 //       Strings -> NULL.
 
 CArgs::
-CArgs(const std::string &def) :
- def_           (""),
- args_          (),
- skip_remaining_(false),
- help_          (false)
+CArgs(const std::string &def)
 {
   setFormat(def);
 }
@@ -398,11 +394,8 @@ setFormat(const std::string &def)
 CArgs::
 ~CArgs()
 {
-  ArgList::const_iterator parg1 = args_.begin();
-  ArgList::const_iterator parg2 = args_.end  ();
-
-  for ( ; parg1 != parg2; ++parg1)
-    delete *parg1;
+  for (auto &arg : args_)
+    delete arg;
 }
 
 bool
@@ -415,11 +408,8 @@ vparse(int argc, char **argv, ...)
 
   va_start(vargs, argv);
 
-  ArgList::const_iterator parg1 = args_.begin();
-  ArgList::const_iterator parg2 = args_.end  ();
-
-  for ( ; parg1 != parg2; ++parg1)
-    (*parg1)->setArg(&vargs);
+  for (auto &arg : args_)
+    arg->setArg(&vargs);
 
   va_end(vargs);
 
@@ -436,11 +426,8 @@ vparse(int *argc, char **argv, ...)
 
   va_start(vargs, argv);
 
-  ArgList::const_iterator parg1 = args_.begin();
-  ArgList::const_iterator parg2 = args_.end  ();
-
-  for ( ; parg1 != parg2; ++parg1)
-    (*parg1)->setArg(&vargs);
+  for (auto &arg : args_)
+    arg->setArg(&vargs);
 
   va_end(vargs);
 
@@ -506,21 +493,20 @@ parse1(int *argc, char **argv, bool update)
       continue;
     }
 
-    ArgList::const_iterator parg1 = args_.begin();
-    ArgList::const_iterator parg2 = args_.end  ();
+    auto parg = args_.begin();
 
-    for ( ; parg1 != parg2; ++parg1)
-      if ((*parg1)->optionCmp(argv[i]))
+    for ( ; parg != args_.end(); ++parg)
+      if ((*parg)->optionCmp(argv[i]))
         break;
 
-    if (parg1 == parg2) {
+    if (parg == args_.end()) {
       bool single_letter_flag = false;
 
-      parg1 = args_.begin();
+      parg = args_.begin();
 
-      for ( ; parg1 != parg2; ++parg1) {
-        if ((*parg1)->getType() == CARG_TYPE_BOOLEAN &&
-            (*parg1)->getName().size() == 2) {
+      for ( ; parg != args_.end(); ++parg) {
+        if ((*parg)->getType() == CARG_TYPE_BOOLEAN &&
+            (*parg)->getName().size() == 2) {
           single_letter_flag = true;
           break;
         }
@@ -542,14 +528,14 @@ parse1(int *argc, char **argv, bool update)
       for (int j = 1; argv[i][j] != '\0'; ++j) {
         found = false;
 
-        parg1 = args_.begin();
+        parg = args_.begin();
 
-        for ( ; parg1 != parg2; ++parg1) {
-          if ((*parg1)->getType() != CARG_TYPE_BOOLEAN ||
-              (*parg1)->getName().size() != 2)
+        for ( ; parg != args_.end(); ++parg) {
+          if ((*parg)->getType() != CARG_TYPE_BOOLEAN ||
+              (*parg)->getName().size() != 2)
             continue;
 
-          if (argv[i][j] == (*parg1)->getName()[1]) {
+          if (argv[i][j] == (*parg)->getName()[1]) {
             found = true;
             break;
           }
@@ -571,18 +557,18 @@ parse1(int *argc, char **argv, bool update)
       }
 
       for (int j = 1; argv[i][j] != '\0'; ++j) {
-        parg1 = args_.begin();
+        parg = args_.begin();
 
-        for ( ; parg1 != parg2; ++parg1) {
-          if ((*parg1)->getType() != CARG_TYPE_BOOLEAN ||
-              (*parg1)->getName().size() != 2)
+        for ( ; parg != args_.end(); ++parg) {
+          if ((*parg)->getType() != CARG_TYPE_BOOLEAN ||
+              (*parg)->getName().size() != 2)
             continue;
 
-          if (argv[i][j] == (*parg1)->getName()[1]) {
-            (*parg1)->setValue("", NULL, 0);
+          if (argv[i][j] == (*parg)->getName()[1]) {
+            (*parg)->setValue("", nullptr, 0);
 
             if (update) {
-              if ((*parg1)->getSkip()) {
+              if ((*parg)->getSkip()) {
                 char *argv1 = new char [3];
 
                 argv1[0] = '-';
@@ -599,7 +585,7 @@ parse1(int *argc, char **argv, bool update)
       ++i;
     }
     else {
-      int num_args = (*parg1)->getNumArgs();
+      int num_args = (*parg)->getNumArgs();
 
       if (i + num_args >= *argc) {
         std::cerr << "Error: Missing Value for " << argv[i] << std::endl;
@@ -608,14 +594,13 @@ parse1(int *argc, char **argv, bool update)
 
       ++i;
 
-      bool flag =
-       (*parg1)->setValue(argv[i - 1], (const char **) &argv[i], *argc - i);
+      bool flag = (*parg)->setValue(argv[i - 1], (const char **) &argv[i], *argc - i);
 
       if (! flag)
         std::cerr << "Error: Invalid Value " << argv[i] << " for " << argv[i - 1] << std::endl;
 
       if (update) {
-        if ((*parg1)->getSkip()) {
+        if ((*parg)->getSkip()) {
           new_argv.push_back(argv[i - 1]);
 
           for (int j = 0; j < num_args; ++j)
@@ -695,21 +680,20 @@ parse1(std::vector<std::string> &args, bool update)
       continue;
     }
 
-    ArgList::const_iterator parg1 = args_.begin();
-    ArgList::const_iterator parg2 = args_.end  ();
+    auto parg = args_.begin();
 
-    for ( ; parg1 != parg2; ++parg1)
-      if ((*parg1)->optionCmp(args[i]))
+    for ( ; parg != args_.end(); ++parg)
+      if ((*parg)->optionCmp(args[i]))
         break;
 
-    if (parg1 == parg2) {
+    if (parg == args_.end()) {
       bool single_letter_flag = false;
 
-      parg1 = args_.begin();
+      parg = args_.begin();
 
-      for ( ; parg1 != parg2; ++parg1) {
-        if ((*parg1)->getType() == CARG_TYPE_BOOLEAN &&
-            (*parg1)->getName().size() == 2) {
+      for ( ; parg != args_.end(); ++parg) {
+        if ((*parg)->getType() == CARG_TYPE_BOOLEAN &&
+            (*parg)->getName().size() == 2) {
           single_letter_flag = true;
           break;
         }
@@ -731,14 +715,14 @@ parse1(std::vector<std::string> &args, bool update)
       for (int j = 1; j < len; ++j) {
         found = false;
 
-        parg1 = args_.begin();
+        parg = args_.begin();
 
-        for ( ; parg1 != parg2; ++parg1) {
-          if ((*parg1)->getType() != CARG_TYPE_BOOLEAN ||
-              (*parg1)->getName().size() != 2)
+        for ( ; parg != args_.end(); ++parg) {
+          if ((*parg)->getType() != CARG_TYPE_BOOLEAN ||
+              (*parg)->getName().size() != 2)
             continue;
 
-          if (args[i][j] == (*parg1)->getName()[1]) {
+          if (args[i][j] == (*parg)->getName()[1]) {
             found = true;
             break;
           }
@@ -761,18 +745,18 @@ parse1(std::vector<std::string> &args, bool update)
       }
 
       for (int j = 1; j < len; ++j) {
-        parg1 = args_.begin();
+        parg = args_.begin();
 
-        for ( ; parg1 != parg2; ++parg1) {
-          if ((*parg1)->getType() != CARG_TYPE_BOOLEAN ||
-              (*parg1)->getName().size() != 2)
+        for ( ; parg != args_.end(); ++parg) {
+          if ((*parg)->getType() != CARG_TYPE_BOOLEAN ||
+              (*parg)->getName().size() != 2)
             continue;
 
-          if (args[i][j] == (*parg1)->getName()[1]) {
-            (*parg1)->setValue("", NULL, 0);
+          if (args[i][j] == (*parg)->getName()[1]) {
+            (*parg)->setValue("", nullptr, 0);
 
             if (update) {
-              if ((*parg1)->getSkip()) {
+              if ((*parg)->getSkip()) {
                 std::string args1 = "-x";
 
                 args1[1] = args[i][j];
@@ -787,7 +771,7 @@ parse1(std::vector<std::string> &args, bool update)
       ++i;
     }
     else {
-      int num_args1 = (*parg1)->getNumArgs();
+      int num_args1 = (*parg)->getNumArgs();
 
       if (i + num_args1 >= num_args) {
         std::cerr << "Error: Missing Value for " << args[i] << std::endl;
@@ -801,13 +785,13 @@ parse1(std::vector<std::string> &args, bool update)
       for (int j = i; j < num_args; ++j)
         args1.push_back(args[i]);
 
-      bool flag = (*parg1)->setValue(args[i - 1], args1);
+      bool flag = (*parg)->setValue(args[i - 1], args1);
 
       if (! flag)
         std::cerr << "Error: Invalid Value " << args[i] << " for " << args[i - 1] << std::endl;
 
       if (update) {
-        if ((*parg1)->getSkip()) {
+        if ((*parg)->getSkip()) {
           new_args.push_back(args[i - 1]);
 
           for (int j = 0; j < num_args1; ++j)
@@ -834,7 +818,7 @@ getBooleanArg(const std::string &name) const
 {
   CArgBoolean *arg = lookupBooleanArg(name);
 
-  if (arg == NULL) {
+  if (! arg) {
     CTHROW(std::string("Option ") + name + std::string(" is not Boolean"));
     return false;
   }
@@ -850,7 +834,7 @@ getBooleanArg(int i) const
 
   CArgBoolean *arg1 = dynamic_cast<CArgBoolean *>(arg);
 
-  if (arg1 == NULL) {
+  if (! arg1) {
     CTHROW(std::string("Option ") + arg->getName() + std::string(" is not Boolean"));
     return false;
   }
@@ -864,7 +848,7 @@ getIntegerArg(const std::string &name) const
 {
   CArgInteger *arg = lookupIntegerArg(name);
 
-  if (arg == NULL) {
+  if (! arg) {
     CTHROW(std::string("Option ") + name + std::string(" is not Integer"));
     return 0;
   }
@@ -880,7 +864,7 @@ getIntegerArg(int i) const
 
   CArgInteger *arg1 = dynamic_cast<CArgInteger *>(arg);
 
-  if (arg1 == NULL) {
+  if (! arg1) {
     CTHROW(std::string("Option ") + arg->getName() + std::string(" is not Integer"));
     return 0;
   }
@@ -894,7 +878,7 @@ getRealArg(const std::string &name) const
 {
   CArgReal *arg = lookupRealArg(name);
 
-  if (arg == NULL) {
+  if (! arg) {
     CTHROW(std::string("Option ") + name + std::string(" is not Real"));
     return 0.0;
   }
@@ -910,7 +894,7 @@ getRealArg(int i) const
 
   CArgReal *arg1 = dynamic_cast<CArgReal *>(arg);
 
-  if (arg1 == NULL) {
+  if (! arg1) {
     CTHROW(std::string("Option ") + arg->getName() + std::string(" is not Real"));
     return 0.0;
   }
@@ -924,7 +908,7 @@ getStringArg(const std::string &name) const
 {
   CArgString *arg = lookupStringArg(name);
 
-  if (arg == NULL) {
+  if (! arg) {
     CTHROW(std::string("Option ") + name + std::string(" is not String"));
     return "";
   }
@@ -940,7 +924,7 @@ getStringArg(int i) const
 
   CArgString *arg1 = dynamic_cast<CArgString *>(arg);
 
-  if (arg1 == NULL) {
+  if (! arg1) {
     CTHROW(std::string("Option ") + arg->getName() + std::string(" is not String"));
     return "";
   }
@@ -954,7 +938,7 @@ getStringListArg(const std::string &name) const
 {
   CArgStringList *arg = lookupStringListArg(name);
 
-  if (arg == NULL) {
+  if (! arg) {
     CTHROW(std::string("Option ") + name + std::string(" is not String List"));
     StringList t;
     return t;
@@ -971,7 +955,7 @@ getStringListArg(int i) const
 
   CArgStringList *arg1 = dynamic_cast<CArgStringList *>(arg);
 
-  if (arg1 == NULL) {
+  if (! arg1) {
     CTHROW(std::string("Option ") + arg->getName() + std::string(" is not String List"));
     StringList t;
     return t;
@@ -986,7 +970,7 @@ getChoiceArg(const std::string &name) const
 {
   CArgChoice *arg = lookupChoiceArg(name);
 
-  if (arg == NULL) {
+  if (! arg) {
     CTHROW(std::string("Option ") + name + std::string(" is not Choice"));
     return -1;
   }
@@ -1002,7 +986,7 @@ getChoiceArg(int i) const
 
   CArgChoice *arg1 = dynamic_cast<CArgChoice *>(arg);
 
-  if (arg1 == NULL) {
+  if (! arg1) {
     CTHROW(std::string("Option ") + arg->getName() + std::string(" is not Choice"));
     return -1;
   }
@@ -1016,7 +1000,7 @@ isBooleanArg(const std::string &name) const
 {
   CArgBoolean *arg = lookupBooleanArg(name);
 
-  if (arg == NULL)
+  if (! arg)
     return false;
 
   return true;
@@ -1030,7 +1014,7 @@ isBooleanArg(int i) const
 
   CArgBoolean *arg1 = dynamic_cast<CArgBoolean *>(arg);
 
-  if (arg1 == NULL)
+  if (! arg1)
     return false;
 
   return true;
@@ -1042,7 +1026,7 @@ isIntegerArg(const std::string &name) const
 {
   CArgInteger *arg = lookupIntegerArg(name);
 
-  if (arg == NULL)
+  if (! arg)
     return false;
 
   return true;
@@ -1056,7 +1040,7 @@ isIntegerArg(int i) const
 
   CArgInteger *arg1 = dynamic_cast<CArgInteger *>(arg);
 
-  if (arg1 == NULL)
+  if (! arg1)
     return false;
 
   return true;
@@ -1068,7 +1052,7 @@ isIntegerArgSet(const std::string &name) const
 {
   CArgInteger *arg = lookupIntegerArg(name);
 
-  if (arg == NULL)
+  if (! arg)
     return false;
 
   return arg->getSet();
@@ -1080,7 +1064,7 @@ isRealArg(const std::string &name) const
 {
   CArgReal *arg = lookupRealArg(name);
 
-  if (arg == NULL)
+  if (! arg)
     return false;
 
   return true;
@@ -1094,7 +1078,7 @@ isRealArg(int i) const
 
   CArgReal *arg1 = dynamic_cast<CArgReal *>(arg);
 
-  if (arg1 == NULL)
+  if (! arg1)
     return false;
 
   return true;
@@ -1106,7 +1090,7 @@ isRealArgSet(const std::string &name) const
 {
   CArgReal *arg = lookupRealArg(name);
 
-  if (arg == NULL)
+  if (! arg)
     return false;
 
   return arg->getSet();
@@ -1118,7 +1102,7 @@ isStringArg(const std::string &name) const
 {
   CArgString *arg = lookupStringArg(name);
 
-  if (arg == NULL)
+  if (! arg)
     return false;
 
   return true;
@@ -1132,7 +1116,7 @@ isStringArg(int i) const
 
   CArgString *arg1 = dynamic_cast<CArgString *>(arg);
 
-  if (arg1 == NULL)
+  if (! arg1)
     return false;
 
   return true;
@@ -1144,7 +1128,7 @@ isStringArgSet(const std::string &name) const
 {
   CArgString *arg = lookupStringArg(name);
 
-  if (arg == NULL)
+  if (! arg)
     return false;
 
   return arg->getSet();
@@ -1156,7 +1140,7 @@ isStringListArg(const std::string &name) const
 {
   CArgStringList *arg = lookupStringListArg(name);
 
-  if (arg == NULL)
+  if (! arg)
     return false;
 
   return true;
@@ -1170,7 +1154,7 @@ isStringListArg(int i) const
 
   CArgStringList *arg1 = dynamic_cast<CArgStringList *>(arg);
 
-  if (arg1 == NULL)
+  if (! arg1)
     return false;
 
   return true;
@@ -1182,7 +1166,7 @@ isStringListArgSet(const std::string &name) const
 {
   CArgStringList *arg = lookupStringListArg(name);
 
-  if (arg == NULL)
+  if (! arg)
     return false;
 
   return arg->getSet();
@@ -1194,7 +1178,7 @@ isChoiceArg(const std::string &name) const
 {
   CArgChoice *arg = lookupChoiceArg(name);
 
-  if (arg == NULL)
+  if (! arg)
     return false;
 
   return true;
@@ -1208,7 +1192,7 @@ isChoiceArg(int i) const
 
   CArgChoice *arg1 = dynamic_cast<CArgChoice *>(arg);
 
-  if (arg1 == NULL)
+  if (! arg1)
     return false;
 
   return true;
@@ -1220,13 +1204,13 @@ lookupBooleanArg(const std::string &name) const
 {
   CArg *arg = lookupArg(name);
 
-  if (arg == NULL)
-    return NULL;
+  if (! arg)
+    return nullptr;
 
   CArgBoolean *arg1 = dynamic_cast<CArgBoolean*>(arg);
 
-  if (arg1 == NULL)
-    return NULL;
+  if (! arg1)
+    return nullptr;
 
   return arg1;
 }
@@ -1237,13 +1221,13 @@ lookupIntegerArg(const std::string &name) const
 {
   CArg *arg = lookupArg(name);
 
-  if (arg == NULL)
-    return NULL;
+  if (! arg)
+    return nullptr;
 
   CArgInteger *arg1 = dynamic_cast<CArgInteger*>(arg);
 
-  if (arg1 == NULL)
-    return NULL;
+  if (! arg1)
+    return nullptr;
 
   return arg1;
 }
@@ -1254,13 +1238,13 @@ lookupRealArg(const std::string &name) const
 {
   CArg *arg = lookupArg(name);
 
-  if (arg == NULL)
-    return NULL;
+  if (! arg)
+    return nullptr;
 
   CArgReal *arg1 = dynamic_cast<CArgReal*>(arg);
 
-  if (arg1 == NULL)
-    return NULL;
+  if (! arg1)
+    return nullptr;
 
   return arg1;
 }
@@ -1271,13 +1255,13 @@ lookupStringArg(const std::string &name) const
 {
   CArg *arg = lookupArg(name);
 
-  if (arg == NULL)
-    return NULL;
+  if (! arg)
+    return nullptr;
 
   CArgString *arg1 = dynamic_cast<CArgString*>(arg);
 
-  if (arg1 == NULL)
-    return NULL;
+  if (! arg1)
+    return nullptr;
 
   return arg1;
 }
@@ -1288,13 +1272,13 @@ lookupStringListArg(const std::string &name) const
 {
   CArg *arg = lookupArg(name);
 
-  if (arg == NULL)
-    return NULL;
+  if (! arg)
+    return nullptr;
 
   CArgStringList *arg1 = dynamic_cast<CArgStringList*>(arg);
 
-  if (arg1 == NULL)
-    return NULL;
+  if (! arg1)
+    return nullptr;
 
   return arg1;
 }
@@ -1305,13 +1289,13 @@ lookupChoiceArg(const std::string &name) const
 {
   CArg *arg = lookupArg(name);
 
-  if (arg == NULL)
-    return NULL;
+  if (! arg)
+    return nullptr;
 
   CArgChoice *arg1 = dynamic_cast<CArgChoice*>(arg);
 
-  if (arg1 == NULL)
-    return NULL;
+  if (! arg1)
+    return nullptr;
 
   return arg1;
 }
@@ -1320,25 +1304,19 @@ CArg *
 CArgs::
 lookupArg(const std::string &name) const
 {
-  ArgList::const_iterator parg1 = args_.begin();
-  ArgList::const_iterator parg2 = args_.end  ();
+  for (auto &arg : args_)
+    if (arg->nameCmp(name))
+      return arg;
 
-  for ( ; parg1 != parg2; ++parg1)
-    if ((*parg1)->nameCmp(name))
-      return *parg1;
-
-  return NULL;
+  return nullptr;
 }
 
 void
 CArgs::
 resetSet()
 {
-  ArgList::const_iterator parg1 = args_.begin();
-  ArgList::const_iterator parg2 = args_.end  ();
-
-  for ( ; parg1 != parg2; ++parg1)
-    (*parg1)->setSet(false);
+  for (auto &arg : args_)
+    arg->setSet(false);
 }
 
 bool
@@ -1347,12 +1325,9 @@ checkRequired()
 {
   bool all_found = true;
 
-  ArgList::const_iterator parg1 = args_.begin();
-  ArgList::const_iterator parg2 = args_.end  ();
-
-  for ( ; parg1 != parg2; ++parg1) {
-    if ((*parg1)->getRequired() && ! (*parg1)->getSet()) {
-      std::cerr << "Required argument " << (*parg1)->getName() << " not supplied" << std::endl;
+  for (auto &arg : args_) {
+    if (arg->getRequired() && ! arg->getSet()) {
+      std::cerr << "Required argument " << arg->getName() << " not supplied" << std::endl;
       all_found = false;
     }
   }
@@ -1396,20 +1371,17 @@ usage(const std::string &cmd) const
 
   std::cerr << cmd << " ";
 
-  ArgList::const_iterator parg1 = args_.begin();
-  ArgList::const_iterator parg2 = args_.end  ();
-
-  for ( ; parg1 != parg2; ++parg1) {
-    if (! (*parg1)->getRequired())
+  for (auto &arg : args_) {
+    if (! arg->getRequired())
       std::cerr << "[";
 
-    std::cerr << (*parg1)->getName();
+    std::cerr << arg->getName();
 
-    max_name_len = std::max((int) (*parg1)->getName().size(), max_name_len);
+    max_name_len = std::max((int) arg->getName().size(), max_name_len);
 
-    CArgType type = (*parg1)->getType();
+    CArgType type = arg->getType();
 
-    if (type != CARG_TYPE_BOOLEAN && ! (*parg1)->getAttached())
+    if (type != CARG_TYPE_BOOLEAN && ! arg->getAttached())
       std::cerr << " ";
 
     if      (type == CARG_TYPE_INTEGER)
@@ -1421,7 +1393,7 @@ usage(const std::string &cmd) const
     else if (type == CARG_TYPE_CHOICE)
       std::cerr << "<choice>";
 
-    if (! (*parg1)->getRequired())
+    if (! arg->getRequired())
       std::cerr << "]";
 
     std::cerr << " ";
@@ -1429,19 +1401,17 @@ usage(const std::string &cmd) const
 
   std::cerr << std::endl;
 
-  parg1 = args_.begin();
-
-  for ( ; parg1 != parg2; ++parg1) {
+  for (auto &arg : args_) {
     std::cerr << " ";
 
-    std::cerr << (*parg1)->getName();
+    std::cerr << arg->getName();
 
-    for (uint i = 0; i < max_name_len - (*parg1)->getName().size(); ++i)
+    for (uint i = 0; i < max_name_len - arg->getName().size(); ++i)
       std::cerr << " ";
 
     std::cerr << " : ";
 
-    std::cerr << (*parg1)->getDesc();
+    std::cerr << arg->getDesc();
 
     std::cerr << std::endl;
   }
@@ -1451,18 +1421,15 @@ void
 CArgs::
 print() const
 {
-  ArgList::const_iterator parg1 = args_.begin();
-  ArgList::const_iterator parg2 = args_.end  ();
-
-  for ( ; parg1 != parg2; ++parg1)
-    (*parg1)->print();
+  for (auto &arg : args_)
+    arg->print();
 }
 
 //-------
 
 CArg::
 CArg(const std::string &name, CArgType type, int flags, bool attached, const std::string &desc) :
- name_(name), type_(type), flags_(flags), attached_(attached), set_(false), desc_(desc)
+ name_(name), type_(type), flags_(flags), attached_(attached), desc_(desc)
 {
 }
 
@@ -1636,7 +1603,7 @@ setArg1(va_list *vargs)
 {
   bool *value = va_arg(*vargs, bool *);
 
-  if (value == NULL)
+  if (! value)
     return false;
 
   *value = value_;
@@ -1657,8 +1624,8 @@ print() const
 //-------
 
 CArgInteger::
-CArgInteger(const std::string &name, int flags, long defval,
-            bool attached, const std::string &desc) :
+CArgInteger(const std::string &name, int flags, long defval, bool attached,
+            const std::string &desc) :
  CArg(name, CARG_TYPE_INTEGER, flags, attached, desc), value_(defval), defval_(defval) {
 }
 
@@ -1680,7 +1647,7 @@ setArg1(va_list *vargs)
 {
   long *value = va_arg(*vargs, long *);
 
-  if (value == NULL)
+  if (! value)
     return false;
 
   *value = value_;
@@ -1725,7 +1692,7 @@ setArg1(va_list *vargs)
 {
   double *value = va_arg(*vargs, double *);
 
-  if (value == NULL)
+  if (! value)
     return false;
 
   *value = value_;
@@ -1746,8 +1713,8 @@ print() const
 //------
 
 CArgString::
-CArgString(const std::string &name, int flags, const std::string &defval,
-           bool attached, const std::string &desc) :
+CArgString(const std::string &name, int flags, const std::string &defval, bool attached,
+           const std::string &desc) :
  CArg(name, CARG_TYPE_STRING, flags, attached, desc), value_(defval), defval_(defval)
 {
 }
@@ -1767,7 +1734,7 @@ setArg1(va_list *vargs)
 {
   std::string *value = va_arg(*vargs, std::string *);
 
-  if (value == NULL)
+  if (! value)
     return false;
 
   *value = value_;
@@ -1788,9 +1755,9 @@ print() const
 //------
 
 CArgStringList::
-CArgStringList(const std::string &name, int flags, const std::string &defval,
-               bool attached, const std::string &desc) :
- CArg(name, CARG_TYPE_STRING, flags, attached, desc), values_(), defval_(defval)
+CArgStringList(const std::string &name, int flags, const std::string &defval, bool attached,
+               const std::string &desc) :
+ CArg(name, CARG_TYPE_STRING, flags, attached, desc), defval_(defval)
 {
 }
 
@@ -1809,7 +1776,7 @@ setArg1(va_list *vargs)
 {
   std::string *value = va_arg(*vargs, std::string *);
 
-  if (value == NULL)
+  if (! value)
     return false;
 
   if (values_.empty())
@@ -1845,8 +1812,8 @@ print() const
 //------
 
 CArgChoice::
-CArgChoice(const std::string &name, int flags, const ChoiceList &choices,
-           long defval, bool attached, const std::string &desc) :
+CArgChoice(const std::string &name, int flags, const ChoiceList &choices, long defval,
+           bool attached, const std::string &desc) :
  CArg(name, CARG_TYPE_CHOICE, flags,  attached, desc), value_(defval),
  choices_(choices), defval_(defval)
 {
@@ -1882,7 +1849,7 @@ setArg1(va_list *vargs)
 {
   long *value = va_arg(*vargs, long *);
 
-  if (value == NULL)
+  if (! value)
     return false;
 
   *value = value_;
