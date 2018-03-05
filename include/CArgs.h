@@ -238,6 +238,8 @@ class CArgs {
 
   bool isHelp() const { return help_; }
 
+  //---
+
   bool vparse(int  argc, char **argv, ...);
   bool vparse(int *argc, char **argv, ...);
 
@@ -245,6 +247,8 @@ class CArgs {
   bool parse(int *argc, char **argv);
   bool parse(const std::vector<std::string> &args);
   bool parse(std::vector<std::string> &args);
+
+  //---
 
   bool isBooleanArg   (const std::string &name) const;
   bool isIntegerArg   (const std::string &name) const;
@@ -265,6 +269,8 @@ class CArgs {
   bool isStringArgSet    (const std::string &name) const;
   bool isStringListArgSet(const std::string &name) const;
 
+  //---
+
   bool        getBooleanArg   (const std::string &name) const;
   long        getIntegerArg   (const std::string &name) const;
   double      getRealArg      (const std::string &name) const;
@@ -276,9 +282,30 @@ class CArgs {
   long        getIntegerArg   (int i) const;
   double      getRealArg      (int i) const;
   std::string getStringArg    (int i) const;
-  StringList getStringListArg(int i) const;
-  long       getChoiceArg    (int i) const;
+  StringList  getStringListArg(int i) const;
+  long        getChoiceArg    (int i) const;
 
+  template<typename T> T getArg(const std::string &name) const {
+    T dummy;
+
+    return getArgHelper(name, dummy);
+  }
+
+ private:
+  bool        getArgHelper(const std::string &name, const bool &) const {
+    return getBooleanArg   (name); }
+  long        getArgHelper(const std::string &name, const long &) const {
+    return getIntegerArg   (name); }
+  double      getArgHelper(const std::string &name, const double &) const {
+    return getRealArg      (name); }
+  std::string getArgHelper(const std::string &name, const std::string &) const {
+    return getStringArg    (name); }
+  StringList  getArgHelper(const std::string &name, const StringList &) const {
+    return getStringListArg(name); }
+
+  //---
+
+ public:
   void resetSet();
   bool checkRequired();
 
