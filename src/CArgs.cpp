@@ -1048,6 +1048,18 @@ isIntegerArg(int i) const
 
 bool
 CArgs::
+isBooleanArgSet(const std::string &name) const
+{
+  CArgBoolean *arg = lookupBooleanArg(name);
+
+  if (! arg)
+    return false;
+
+  return arg->getSet();
+}
+
+bool
+CArgs::
 isIntegerArgSet(const std::string &name) const
 {
   CArgInteger *arg = lookupIntegerArg(name);

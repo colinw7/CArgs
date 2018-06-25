@@ -264,6 +264,7 @@ class CArgs {
   bool isStringListArg(int i) const;
   bool isChoiceArg    (int i) const;
 
+  bool isBooleanArgSet   (const std::string &name) const;
   bool isIntegerArgSet   (const std::string &name) const;
   bool isRealArgSet      (const std::string &name) const;
   bool isStringArgSet    (const std::string &name) const;
