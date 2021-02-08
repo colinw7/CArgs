@@ -190,12 +190,12 @@ setFormat(const std::string &def)
 
         ++i;
 
-        int j = i;
+        int jj = i;
 
         while (i < def.size() && def[i] != ']')
           ++i;
 
-        std::string opts = def.substr(j, i - j);
+        std::string opts = def.substr(jj, i - jj);
 
         std::vector<std::string> words;
 
@@ -208,12 +208,12 @@ setFormat(const std::string &def)
       ++i;
 
       if (isdigit(def[i])) {
-        int j = i;
+        int jj = i;
 
         while (i < def.size() && isdigit(def[i]))
           ++i;
 
-        std::string istr = def.substr(j, i - j);
+        std::string istr = def.substr(jj, i - jj);
 
         if (! CStrUtil::isInteger(istr)) {
           CTHROW("Invalid Integer for Count");
@@ -250,7 +250,7 @@ setFormat(const std::string &def)
     if (i < def.size() && def[i] == '=') {
       ++i;
 
-      int j = i;
+      int jj = i;
 
       while (i < def.size() && ! isspace(def[i])) {
         if (def[i] == '\\')
@@ -259,7 +259,7 @@ setFormat(const std::string &def)
         ++i;
       }
 
-      defval = def.substr(j, i - j);
+      defval = def.substr(jj, i - jj);
     }
 
     //------
@@ -276,7 +276,7 @@ setFormat(const std::string &def)
 
       ++i;
 
-      int j = i;
+      int jj = i;
 
       while (i < def.size() && def[i] != ')') {
         if (def[i] == '\\')
@@ -285,7 +285,7 @@ setFormat(const std::string &def)
         ++i;
       }
 
-      desc = def.substr(j, i - j);
+      desc = def.substr(jj, i - jj);
 
       if (i < def.size() && def[i] == ')')
         ++i;
