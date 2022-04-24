@@ -9,7 +9,7 @@
 #include <iostream>
 
 #define strndup_m(s,n) \
-  strncpy((char *) calloc((n)+1,sizeof(char)),s,n)
+  strncpy(reinterpret_cast<char *>(calloc((n) + 1, sizeof(char))), s, n)
 
 enum CArgType {
   CARG_TYPE_NONE,
@@ -182,7 +182,7 @@ class CArgStringList : public CArg {
   CArgStringList(const std::string &name, int flags, const std::string &defval,
                  bool attached, const std::string &desc);
 
-  virtual int getNumArgs1() const { return values_.size(); }
+  virtual int getNumArgs1() const { return int(values_.size()); }
 
   virtual bool setValue1(const char **args, int);
 
@@ -310,8 +310,8 @@ class CArgs {
   void resetSet();
   bool checkRequired();
 
-  int   getNumArgs() const { return args_.size(); }
-  CArg *getArg(int i) const { return args_[i]; }
+  int   getNumArgs() const { return int(args_.size()); }
+  CArg *getArg(int i) const { return args_[size_t(i)]; }
 
   bool checkOption(const char *arg, std::string &opt);
 

@@ -190,7 +190,7 @@ setFormat(const std::string &def)
 
         ++i;
 
-        int jj = i;
+        auto jj = i;
 
         while (i < def.size() && def[i] != ']')
           ++i;
@@ -208,7 +208,7 @@ setFormat(const std::string &def)
       ++i;
 
       if (isdigit(def[i])) {
-        int jj = i;
+        auto jj = i;
 
         while (i < def.size() && isdigit(def[i]))
           ++i;
@@ -220,7 +220,7 @@ setFormat(const std::string &def)
           return;
         }
 
-        count = CStrUtil::toInteger(istr);
+        count = int(CStrUtil::toInteger(istr));
 
         if (count <= 0) {
           CTHROW(std::string("Invalid Value for Count ") + istr);
@@ -250,7 +250,7 @@ setFormat(const std::string &def)
     if (i < def.size() && def[i] == '=') {
       ++i;
 
-      int jj = i;
+      auto jj = i;
 
       while (i < def.size() && ! isspace(def[i])) {
         if (def[i] == '\\')
@@ -276,7 +276,7 @@ setFormat(const std::string &def)
 
       ++i;
 
-      int jj = i;
+      auto jj = i;
 
       while (i < def.size() && def[i] != ')') {
         if (def[i] == '\\')
@@ -594,7 +594,7 @@ parse1(int *argc, char **argv, bool update)
 
       ++i;
 
-      bool flag = (*parg)->setValue(argv[i - 1], (const char **) &argv[i], *argc - i);
+      bool flag = (*parg)->setValue(argv[i - 1], const_cast<const char **>(&argv[i]), *argc - i);
 
       if (! flag)
         std::cerr << "Error: Invalid Value " << argv[i] << " for " << argv[i - 1] << std::endl;
@@ -613,10 +613,10 @@ parse1(int *argc, char **argv, bool update)
   }
 
   if (update) {
-    *argc = new_argv.size();
+    *argc = int(new_argv.size());
 
-    for (i = 0; i < *argc; ++i)
-      argv[i] = new_argv[i];
+    for (uint ii = 0; ii < uint(*argc); ++ii)
+      argv[ii] = new_argv[ii];
   }
 
   if (! checkRequired())
@@ -645,11 +645,11 @@ bool
 CArgs::
 parse1(std::vector<std::string> &args, bool update)
 {
-  int num_args = args.size();
+  auto num_args = args.size();
 
   std::vector<std::string> new_args;
 
-  int i = 0;
+  uint i = 0;
 
   if (i < num_args) {
     if (update)
@@ -659,7 +659,7 @@ parse1(std::vector<std::string> &args, bool update)
   }
 
   while (i < num_args) {
-    int len = args[i].size();
+    auto len = args[i].size();
 
     if (len == 0 || args[i][0] != '-') {
       if (update)
@@ -712,7 +712,7 @@ parse1(std::vector<std::string> &args, bool update)
 
       bool found = false;
 
-      for (int j = 1; j < len; ++j) {
+      for (uint j = 1; j < len; ++j) {
         found = false;
 
         parg = args_.begin();
@@ -744,7 +744,7 @@ parse1(std::vector<std::string> &args, bool update)
         continue;
       }
 
-      for (int j = 1; j < len; ++j) {
+      for (uint j = 1; j < len; ++j) {
         parg = args_.begin();
 
         for ( ; parg != args_.end(); ++parg) {
@@ -771,7 +771,7 @@ parse1(std::vector<std::string> &args, bool update)
       ++i;
     }
     else {
-      int num_args1 = (*parg)->getNumArgs();
+      auto num_args1 = uint((*parg)->getNumArgs());
 
       if (i + num_args1 >= num_args) {
         std::cerr << "Error: Missing Value for " << args[i] << std::endl;
@@ -782,7 +782,7 @@ parse1(std::vector<std::string> &args, bool update)
 
       std::vector<std::string> args1;
 
-      for (int j = i; j < num_args; ++j)
+      for (uint j = i; j < num_args; ++j)
         args1.push_back(args[i]);
 
       bool flag = (*parg)->setValue(args[i - 1], args1);
@@ -794,7 +794,7 @@ parse1(std::vector<std::string> &args, bool update)
         if ((*parg)->getSkip()) {
           new_args.push_back(args[i - 1]);
 
-          for (int j = 0; j < num_args1; ++j)
+          for (uint j = 0; j < num_args1; ++j)
             new_args.push_back(args[i + j]);
         }
       }
@@ -1379,7 +1379,7 @@ void
 CArgs::
 usage(const std::string &cmd) const
 {
-  int max_name_len = 0;
+  uint max_name_len = 0;
 
   std::cerr << cmd << " ";
 
@@ -1389,7 +1389,7 @@ usage(const std::string &cmd) const
 
     std::cerr << arg->getName();
 
-    max_name_len = std::max((int) arg->getName().size(), max_name_len);
+    max_name_len = std::max(uint(arg->getName().size()), max_name_len);
 
     CArgType type = arg->getType();
 
@@ -1497,14 +1497,14 @@ setValue(const char *opt, const char **args, int num_args)
   else {
     char *arg0 = strndup_m(&opt[name_.size()], strlen(opt) - name_.size());
 
-    char **args1 = new char * [num_args + 1];
+    char **args1 = new char * [uint(num_args + 1)];
 
     args1[0] = arg0;
 
     for (int i = 1; i <= num_args; i++)
-      args1[i] = (char *) args[i - 1];
+      args1[i] = const_cast<char *>(args[i - 1]);
 
-    set_ = setValue1((const char **) args1, num_args + 1);
+    set_ = setValue1(const_cast<const char **>(args1), num_args + 1);
 
     delete [] args1;
 
@@ -1518,13 +1518,13 @@ bool
 CArg::
 setValue(const std::string &opt, const std::vector<std::string> &args)
 {
-  int    num_args1 = args.size();
+  auto   num_args1 = args.size();
   char **args1     = new char * [num_args1];
 
-  for (int i = 0; i < num_args1; ++i)
-    args1[i] = (char *) args[i].c_str();
+  for (uint i = 0; i < num_args1; ++i)
+    args1[i] = const_cast<char *>(args[i].c_str());
 
-  bool rc = setValue(opt.c_str(), (const char **) args1, num_args1);
+  bool rc = setValue(opt.c_str(), const_cast<const char **>(args1), int(num_args1));
 
   delete [] args1;
 
@@ -1648,7 +1648,7 @@ setValue1(const char **args, int)
   if (! CStrUtil::isInteger(args[0]))
     return false;
 
-  value_ = CStrUtil::toInteger(args[0]);
+  value_ = int(CStrUtil::toInteger(args[0]));
 
   return true;
 }
@@ -1805,11 +1805,11 @@ print() const
 {
   CArg::print();
 
-  int num_values = values_.size();
+  auto num_values = values_.size();
 
   std::cout << "Values   ";
 
-  for (int i = 0; i < num_values; ++i) {
+  for (uint i = 0; i < num_values; ++i) {
     if (i > 0)
       std::cout << ", ";
 
