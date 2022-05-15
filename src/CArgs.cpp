@@ -2,6 +2,9 @@
 #include <CStrUtil.h>
 #include <CThrow.h>
 
+#define strndup_m(s,n) \
+  strncpy(reinterpret_cast<char *>(calloc((n) + 1, sizeof(char))), s, n)
+
 //
 // The format of the options definition is a space separated list
 // of option definitions of the form:

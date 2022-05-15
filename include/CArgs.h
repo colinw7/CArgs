@@ -8,9 +8,6 @@
 #include <cstdarg>
 #include <iostream>
 
-#define strndup_m(s,n) \
-  strncpy(reinterpret_cast<char *>(calloc((n) + 1, sizeof(char))), s, n)
-
 enum CArgType {
   CARG_TYPE_NONE,
   CARG_TYPE_BOOLEAN,
