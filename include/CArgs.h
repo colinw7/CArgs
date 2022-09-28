@@ -284,7 +284,7 @@ class CArgs {
   long        getChoiceArg    (int i) const;
 
   template<typename T> T getArg(const std::string &name) const {
-    T dummy;
+    T dummy { };
 
     return getArgHelper(name, dummy);
   }
