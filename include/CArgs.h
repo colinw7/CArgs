@@ -88,15 +88,15 @@ class CArgBoolean : public CArg {
  public:
   CArgBoolean(const std::string &name, int flags, bool defval, const std::string &desc);
 
-  virtual int getNumArgs1() const { return 0; }
+  int getNumArgs1() const override { return 0; }
 
-  virtual bool setValue1(const char **, int);
+  bool setValue1(const char **, int) override;
 
-  virtual bool setArg1(va_list *vargs);
+  bool setArg1(va_list *vargs) override;
 
   bool getValue() const { return value_; }
 
-  virtual void print() const;
+  void print() const override;
 
  private:
   bool value_  { false };
@@ -110,15 +110,15 @@ class CArgInteger : public CArg {
   CArgInteger(const std::string &name, int flags, long defval, bool attached,
               const std::string &desc);
 
-  virtual int getNumArgs1() const { return 1; }
+  int getNumArgs1() const override { return 1; }
 
-  virtual bool setValue1(const char **args, int);
+  bool setValue1(const char **args, int) override;
 
-  virtual bool setArg1(va_list *vargs);
+  bool setArg1(va_list *vargs) override;
 
   long getValue() const { return value_; }
 
-  virtual void print() const;
+  void print() const override;
 
  private:
   long value_  { 0 };
@@ -132,15 +132,15 @@ class CArgReal : public CArg {
   CArgReal(const std::string &name, int flags, double defval, bool attached,
            const std::string &desc);
 
-  virtual int getNumArgs1() const { return 1; }
+  int getNumArgs1() const override { return 1; }
 
-  virtual bool setValue1(const char **args, int);
+  bool setValue1(const char **args, int) override;
 
-  virtual bool setArg1(va_list *vargs);
+  bool setArg1(va_list *vargs) override;
 
   double getValue() const { return value_; }
 
-  virtual void print() const;
+  void print() const override;
 
  private:
   double value_  { 0.0 };
@@ -154,15 +154,15 @@ class CArgString : public CArg {
   CArgString(const std::string &name, int flags, const std::string &defval,
              bool attached, const std::string &desc);
 
-  virtual int getNumArgs1() const { return 1; }
+  int getNumArgs1() const override { return 1; }
 
-  virtual bool setValue1(const char **args, int);
+  bool setValue1(const char **args, int) override;
 
-  virtual bool setArg1(va_list *vargs);
+  bool setArg1(va_list *vargs) override;
 
   const std::string &getValue() const { return value_; }
 
-  virtual void print() const;
+  void print() const override;
 
  private:
   std::string value_;
@@ -179,15 +179,15 @@ class CArgStringList : public CArg {
   CArgStringList(const std::string &name, int flags, const std::string &defval,
                  bool attached, const std::string &desc);
 
-  virtual int getNumArgs1() const { return int(values_.size()); }
+  int getNumArgs1() const override { return int(values_.size()); }
 
-  virtual bool setValue1(const char **args, int);
+  bool setValue1(const char **args, int) override;
 
-  virtual bool setArg1(va_list *vargs);
+  bool setArg1(va_list *vargs) override;
 
   const ValueList &getValue() const { return values_; }
 
-  virtual void print() const;
+  void print() const override;
 
  private:
   ValueList   values_;
@@ -204,15 +204,15 @@ class CArgChoice : public CArg {
   CArgChoice(const std::string &name, int flags, const ChoiceList &choices,
              long defval, bool attached, const std::string &desc);
 
-  virtual int getNumArgs1() const { return 1; }
+  int getNumArgs1() const override { return 1; }
 
-  virtual bool setValue1(const char **args, int);
+  bool setValue1(const char **args, int) override;
 
-  virtual bool setArg1(va_list *vargs);
+  bool setArg1(va_list *vargs) override;
 
   long getValue() const { return value_; }
 
-  virtual void print() const;
+  void print() const override;
 
  private:
   long       value_ { 0 };
