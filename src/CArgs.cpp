@@ -516,7 +516,7 @@ parse1(int *argc, char **argv, bool update)
       }
 
       if (! single_letter_flag) {
-        std::cerr << "Warning: Unrecognised argument " << argv[i] << std::endl;
+        std::cerr << "Warning: Unrecognised argument " << argv[i] << "\n";
 
         if (update)
           new_argv.push_back(argv[i]);
@@ -545,7 +545,7 @@ parse1(int *argc, char **argv, bool update)
         }
 
         if (! found) {
-          std::cerr << "Warning: Unrecognised argument -" << argv[i][j] << std::endl;
+          std::cerr << "Warning: Unrecognised argument -" << argv[i][j] << "\n";
           break;
         }
       }
@@ -591,7 +591,7 @@ parse1(int *argc, char **argv, bool update)
       int num_args = (*parg)->getNumArgs();
 
       if (i + num_args >= *argc) {
-        std::cerr << "Error: Missing Value for " << argv[i] << std::endl;
+        std::cerr << "Error: Missing Value for " << argv[i] << "\n";
         break;
       }
 
@@ -600,7 +600,7 @@ parse1(int *argc, char **argv, bool update)
       bool flag = (*parg)->setValue(argv[i - 1], const_cast<const char **>(&argv[i]), *argc - i);
 
       if (! flag)
-        std::cerr << "Error: Invalid Value " << argv[i] << " for " << argv[i - 1] << std::endl;
+        std::cerr << "Error: Invalid Value " << argv[i] << " for " << argv[i - 1] << "\n";
 
       if (update) {
         if ((*parg)->getSkip()) {
@@ -703,7 +703,7 @@ parse1(std::vector<std::string> &args, bool update)
       }
 
       if (! single_letter_flag) {
-        std::cerr << "Warning: Unrecognised argument " << args[i] << std::endl;
+        std::cerr << "Warning: Unrecognised argument " << args[i] << "\n";
 
         if (update)
           new_args.push_back(args[i]);
@@ -732,7 +732,7 @@ parse1(std::vector<std::string> &args, bool update)
         }
 
         if (! found) {
-          std::cerr << "Warning: Unrecognised argument -" << args[i][j] << std::endl;
+          std::cerr << "Warning: Unrecognised argument -" << args[i][j] << "\n";
 
           break;
         }
@@ -777,7 +777,7 @@ parse1(std::vector<std::string> &args, bool update)
       auto num_args1 = uint((*parg)->getNumArgs());
 
       if (i + num_args1 >= num_args) {
-        std::cerr << "Error: Missing Value for " << args[i] << std::endl;
+        std::cerr << "Error: Missing Value for " << args[i] << "\n";
         break;
       }
 
@@ -791,7 +791,7 @@ parse1(std::vector<std::string> &args, bool update)
       bool flag = (*parg)->setValue(args[i - 1], args1);
 
       if (! flag)
-        std::cerr << "Error: Invalid Value " << args[i] << " for " << args[i - 1] << std::endl;
+        std::cerr << "Error: Invalid Value " << args[i] << " for " << args[i - 1] << "\n";
 
       if (update) {
         if ((*parg)->getSkip()) {
@@ -1342,7 +1342,7 @@ checkRequired()
 
   for (auto &arg : args_) {
     if (arg->getRequired() && ! arg->getSet()) {
-      std::cerr << "Required argument " << arg->getName() << " not supplied" << std::endl;
+      std::cerr << "Required argument " << arg->getName() << " not supplied\n";
       all_found = false;
     }
   }
@@ -1375,7 +1375,7 @@ CArgs::
 unhandledOpt(const std::string &opt)
 {
   if (opt != "")
-    std::cerr << "Unhandled option: -" << opt << std::endl;
+    std::cerr << "Unhandled option: -" << opt << "\n";
 }
 
 void
@@ -1414,7 +1414,7 @@ usage(const std::string &cmd) const
     std::cerr << " ";
   }
 
-  std::cerr << std::endl;
+  std::cerr << "\n";
 
   for (auto &arg : args_) {
     std::cerr << " ";
@@ -1428,7 +1428,7 @@ usage(const std::string &cmd) const
 
     std::cerr << arg->getDesc();
 
-    std::cerr << std::endl;
+    std::cerr << "\n";
   }
 }
 
@@ -1548,10 +1548,10 @@ void
 CArg::
 print() const
 {
-  std::cout << "Name     " << name_                           << std::endl;
-  std::cout << "Type     " << typeToString(type_)             << std::endl;
-  std::cout << "Flags    " << flagsToString(flags_)           << std::endl;
-  std::cout << "Attached " << (attached_  ? "true" : "false") << std::endl;
+  std::cout << "Name     " << name_                           << "\n";
+  std::cout << "Type     " << typeToString(type_)             << "\n";
+  std::cout << "Flags    " << flagsToString(flags_)           << "\n";
+  std::cout << "Attached " << (attached_  ? "true" : "false") << "\n";
 }
 
 std::string
@@ -1632,8 +1632,8 @@ print() const
 {
   CArg::print();
 
-  std::cout << "Value    " << (value_  ? "true" : "false") << std::endl;
-  std::cout << "Default  " << (defval_ ? "true" : "false") << std::endl;
+  std::cout << "Value    " << (value_  ? "true" : "false") << "\n";
+  std::cout << "Default  " << (defval_ ? "true" : "false") << "\n";
 }
 
 //-------
@@ -1676,8 +1676,8 @@ print() const
 {
   CArg::print();
 
-  std::cout << "Value    " << value_  << std::endl;
-  std::cout << "Default  " << defval_ << std::endl;
+  std::cout << "Value    " << value_  << "\n";
+  std::cout << "Default  " << defval_ << "\n";
 }
 
 //-------
@@ -1721,8 +1721,8 @@ print() const
 {
   CArg::print();
 
-  std::cout << "Value    " << value_  << std::endl;
-  std::cout << "Default  " << defval_ << std::endl;
+  std::cout << "Value    " << value_  << "\n";
+  std::cout << "Default  " << defval_ << "\n";
 }
 
 //------
@@ -1763,8 +1763,8 @@ print() const
 {
   CArg::print();
 
-  std::cout << "Value    " << value_  << std::endl;
-  std::cout << "Default  " << defval_ << std::endl;
+  std::cout << "Value    " << value_  << "\n";
+  std::cout << "Default  " << defval_ << "\n";
 }
 
 //------
@@ -1819,9 +1819,9 @@ print() const
     std::cout << values_[i];
   }
 
-  std::cout << std::endl;
+  std::cout << "\n";
 
-  std::cout << "Default  " << defval_ << std::endl;
+  std::cout << "Default  " << defval_ << "\n";
 }
 
 //------
@@ -1842,8 +1842,8 @@ setValue1(const char **args, int)
 
   std::string choice = args[0];
 
-  ChoiceList::const_iterator pstring1 = choices_.begin();
-  ChoiceList::const_iterator pstring2 = choices_.end  ();
+  auto pstring1 = choices_.begin();
+  auto pstring2 = choices_.end  ();
 
   for ( ; pstring1 != pstring2; ++pstring1) {
     if (choice == *pstring1) {
@@ -1878,16 +1878,16 @@ print() const
 {
   CArg::print();
 
-  std::cout << "Value    " << value_  << std::endl;
-  std::cout << "Default  " << defval_ << std::endl;
+  std::cout << "Value    " << value_  << "\n";
+  std::cout << "Default  " << defval_ << "\n";
 
   std::cout << "Choices ";
 
-  ChoiceList::const_iterator pstring1 = choices_.begin();
-  ChoiceList::const_iterator pstring2 = choices_.end  ();
+  auto pstring1 = choices_.begin();
+  auto pstring2 = choices_.end  ();
 
   for ( ; pstring1 != pstring2; ++pstring1)
     std::cout << " " << *pstring1;
 
-  std::cout << std::endl;
+  std::cout << "\n";
 }
