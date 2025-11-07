@@ -455,7 +455,7 @@ bool
 CArgs::
 parse1(int *argc, char **argv, bool update)
 {
-  skip_remaining_ = false;
+  skipRemaining_ = false;
 
   std::vector<char *> new_argv;
 
@@ -469,7 +469,7 @@ parse1(int *argc, char **argv, bool update)
   }
 
   while (i < *argc) {
-    if (argv[i][0] != '-' || skip_remaining_) {
+    if (argv[i][0] != '-' || skipRemaining_) {
       if (update)
         new_argv.push_back(argv[i]);
 
@@ -481,7 +481,7 @@ parse1(int *argc, char **argv, bool update)
     if (strcmp(argv[i], "--") == 0) {
       ++i;
 
-      skip_remaining_ = true;
+      skipRemaining_ = true;
 
       continue;
     }
@@ -516,7 +516,7 @@ parse1(int *argc, char **argv, bool update)
       }
 
       if (! single_letter_flag) {
-        std::cerr << "Warning: Unrecognised argument " << argv[i] << "\n";
+        errorMsg("Unrecognised argument " + std::string(argv[i]));
 
         if (update)
           new_argv.push_back(argv[i]);
@@ -545,7 +545,7 @@ parse1(int *argc, char **argv, bool update)
         }
 
         if (! found) {
-          std::cerr << "Warning: Unrecognised argument -" << argv[i][j] << "\n";
+          errorMsg("Unrecognised argument -" + std::string(&argv[i][j], 1));
           break;
         }
       }
@@ -591,7 +591,7 @@ parse1(int *argc, char **argv, bool update)
       int num_args = (*parg)->getNumArgs();
 
       if (i + num_args >= *argc) {
-        std::cerr << "Error: Missing Value for " << argv[i] << "\n";
+        errorMsg("Missing Value for " + std::string(argv[i]));
         break;
       }
 
@@ -600,7 +600,7 @@ parse1(int *argc, char **argv, bool update)
       bool flag = (*parg)->setValue(argv[i - 1], const_cast<const char **>(&argv[i]), *argc - i);
 
       if (! flag)
-        std::cerr << "Error: Invalid Value " << argv[i] << " for " << argv[i - 1] << "\n";
+        errorMsg("Invalid Value " + std::string(argv[i]) + " for " + std::string(argv[i - 1]));
 
       if (update) {
         if ((*parg)->getSkip()) {
@@ -703,7 +703,7 @@ parse1(std::vector<std::string> &args, bool update)
       }
 
       if (! single_letter_flag) {
-        std::cerr << "Warning: Unrecognised argument " << args[i] << "\n";
+        errorMsg("Unrecognised argument " + args[i]);
 
         if (update)
           new_args.push_back(args[i]);
@@ -732,7 +732,7 @@ parse1(std::vector<std::string> &args, bool update)
         }
 
         if (! found) {
-          std::cerr << "Warning: Unrecognised argument -" << args[i][j] << "\n";
+          errorMsg("Unrecognised argument -" + args[i][j]);
 
           break;
         }
@@ -777,7 +777,7 @@ parse1(std::vector<std::string> &args, bool update)
       auto num_args1 = uint((*parg)->getNumArgs());
 
       if (i + num_args1 >= num_args) {
-        std::cerr << "Error: Missing Value for " << args[i] << "\n";
+        errorMsg("Missing Value for " + args[i]);
         break;
       }
 
@@ -791,7 +791,7 @@ parse1(std::vector<std::string> &args, bool update)
       bool flag = (*parg)->setValue(args[i - 1], args1);
 
       if (! flag)
-        std::cerr << "Error: Invalid Value " << args[i] << " for " << args[i - 1] << "\n";
+        errorMsg("Invalid Value " + args[i] + " for " + args[i - 1]);
 
       if (update) {
         if ((*parg)->getSkip()) {
@@ -1342,7 +1342,7 @@ checkRequired()
 
   for (auto &arg : args_) {
     if (arg->getRequired() && ! arg->getSet()) {
-      std::cerr << "Required argument " << arg->getName() << " not supplied\n";
+      errorMsg("Required argument " + arg->getName() + " not supplied");
       all_found = false;
     }
   }
@@ -1357,12 +1357,12 @@ checkOption(const char *arg, std::string &opt)
   opt = "";
 
   if (strcmp(arg, "--") == 0) {
-    skip_remaining_ = true;
+    skipRemaining_ = true;
 
     return true;
   }
 
-  if (skip_remaining_ || arg[0] != '-')
+  if (skipRemaining_ || arg[0] != '-')
     return false;
 
   opt = &arg[1];
@@ -1375,7 +1375,7 @@ CArgs::
 unhandledOpt(const std::string &opt)
 {
   if (opt != "")
-    std::cerr << "Unhandled option: -" << opt << "\n";
+    errorMsg("Unhandled option: -" + opt);
 }
 
 void
@@ -1430,6 +1430,22 @@ usage(const std::string &cmd) const
 
     std::cerr << "\n";
   }
+}
+
+void
+CArgs::
+warnMsg(const std::string &msg) const
+{
+  std::cerr << "Warning: " << msg<< "\n";
+}
+
+void
+CArgs::
+errorMsg(const std::string &msg) const
+{
+  std::cerr << "Error: " + msg;
+
+  const_cast<CArgs *>(this)->hasError_ = true;
 }
 
 void

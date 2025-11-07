@@ -235,6 +235,8 @@ class CArgs {
 
   bool isHelp() const { return help_; }
 
+  bool hasError() const { return hasError_; }
+
   //---
 
   bool vparse(int  argc, char **argv, ...);
@@ -318,6 +320,9 @@ class CArgs {
 
   void print() const;
 
+  void warnMsg (const std::string &msg) const;
+  void errorMsg(const std::string &msg) const;
+
  private:
   CArgBoolean    *lookupBooleanArg   (const std::string &name) const;
   CArgInteger    *lookupIntegerArg   (const std::string &name) const;
@@ -334,8 +339,9 @@ class CArgs {
  private:
   std::string def_;
   ArgList     args_;
-  bool        skip_remaining_ { false };
-  bool        help_ { false };
+  bool        skipRemaining_ { false };
+  bool        help_          { false };
+  bool        hasError_      { false };
 };
 
 #endif
